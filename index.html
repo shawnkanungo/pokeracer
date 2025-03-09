@@ -24,17 +24,50 @@
       font-family: Arial, sans-serif;
       font-size: 20px;
       color: #333;
+      text-align: center;
+    }
+    #error {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      color: #ff0000;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
   <div id="loading">Loading Party Prep Pal...</div>
+  <div id="error"></div>
   <script>
     window.onerror = function(msg, url, lineNo, columnNo, error) {
       console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
-      document.getElementById('loading').innerHTML = 'Error loading game. Please refresh the page.';
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').innerHTML = 'Error loading game. Please try refreshing the page.<br><br>If the problem persists, please check your internet connection and try again.';
       return false;
     };
+
+    // Check if sketch.js exists
+    fetch('sketch.js')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('sketch.js not found');
+        }
+      })
+      .catch(error => {
+        console.error('Error loading sketch.js:', error);
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').innerHTML = 'Error loading game files. Please try refreshing the page.<br><br>If the problem persists, please check your internet connection and try again.';
+      });
   </script>
   <script src="sketch.js"></script>
   <script>
