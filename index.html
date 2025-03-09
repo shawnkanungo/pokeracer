@@ -1,82 +1,764 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Party Prep Pal</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background-color: #FFE4E1;
-    }
-    #loading {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: Arial, sans-serif;
-      font-size: 20px;
-      color: #333;
-      text-align: center;
-    }
-    #error {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: Arial, sans-serif;
-      font-size: 20px;
-      color: #ff0000;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meera's Dress Up Game</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #9400D3, #4B0082);
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            overflow: hidden;
+        }
+        
+        .game-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            background-image: url("/api/placeholder/400/320");
+            background-size: cover;
+            position: relative;
+        }
+        
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #FF1493;
+            padding: 10px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 10;
+            border-bottom: 5px solid #FF69B4;
+        }
+        
+        .header h1 {
+            margin: 0;
+            color: white;
+            font-size: 24px;
+            text-shadow: 2px 2px 4px #800080;
+        }
+        
+        .wardrobe-panel {
+            width: 40%;
+            height: calc(100vh - 50px);
+            margin-top: 50px;
+            background-color: rgba(255, 20, 147, 0.8);
+            border-right: 8px solid #C71585;
+            border-radius: 0 20px 20px 0;
+            padding: 10px;
+            overflow-y: auto;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+        
+        .character-panel {
+            width: 60%;
+            height: calc(100vh - 50px);
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .category {
+            margin-bottom: 15px;
+            background-color: #C71585;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .category h3 {
+            color: white;
+            margin: 0 0 10px 0;
+            text-align: center;
+            font-size: 18px;
+            text-shadow: 1px 1px 2px black;
+            border-bottom: 2px dashed #FF69B4;
+            padding-bottom: 5px;
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        .item {
+            height: 70px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .item.selected {
+            border: 3px solid gold;
+            box-shadow: 0 0 10px gold;
+        }
+        
+        .item img {
+            max-width: 90%;
+            max-height: 90%;
+            transition: transform 0.3s;
+        }
+        
+        .item:hover img {
+            transform: scale(1.1);
+        }
+        
+        .character {
+            position: relative;
+            width: 300px;
+            height: 500px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.6);
+        }
+        
+        .character-base {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 400px;
+            background-color: #c68642;
+            border-radius: 100px 100px 0 0;
+        }
+        
+        .character-face {
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 60% 60% 55% 55%;
+            background-color: #c68642;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .character-eyes {
+            display: flex;
+            justify-content: space-between;
+            width: 60px;
+            margin-top: 20px;
+        }
+        
+        .eye {
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .eye:after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #000;
+            border-radius: 50%;
+            top: 5px;
+            left: 5px;
+        }
+        
+        .character-smile {
+            width: 40px;
+            height: 20px;
+            border-bottom: 3px solid #000;
+            border-radius: 0 0 20px 20px;
+            margin-top: 15px;
+        }
+        
+        .hair-display, 
+        .outfit-display, 
+        .makeup-display, 
+        .shoes-display, 
+        .accessory-display,
+        .bindi-display {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .hair-display {
+            top: 30px;
+            width: 150px;
+            height: 150px;
+        }
+        
+        .outfit-display {
+            top: 190px;
+            width: 200px;
+            height: 250px;
+        }
+        
+        .makeup-display {
+            top: 100px;
+            width: 120px;
+            height: 30px;
+            opacity: 0.8;
+        }
+        
+        .shoes-display {
+            bottom: 50px;
+            width: 150px;
+            height: 50px;
+        }
+        
+        .accessory-display {
+            top: 130px;
+            width: 150px;
+            height: 50px;
+        }
+        
+        .bindi-display {
+            top: 90px;
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            display: none;
+        }
+        
+        .party-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.3;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            filter: blur(3px);
+        }
+        
+        .party-selector {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+        
+        .party-btn {
+            padding: 8px 15px;
+            background-color: #FF1493;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+        
+        .party-btn:hover {
+            transform: scale(1.1);
+            background-color: #C71585;
+        }
+        
+        .party-btn.active {
+            background-color: #800080;
+            transform: scale(1.1);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        
+        .party-info {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 20px;
+            text-shadow: 1px 1px 2px black;
+            background-color: rgba(199, 21, 133, 0.7);
+            padding: 5px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        
+        .randomize-btn {
+            position: absolute;
+            bottom: 60px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #FFD700;
+            color: black;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s;
+        }
+        
+        .randomize-btn:hover {
+            transform: scale(1.1);
+            background-color: #FFA500;
+        }
+        
+        /* For hair selection */
+        .hair1 { background-color: #000000; border-radius: 75px 75px 0 0; height: 100px; }
+        .hair2 { background-color: #8B4513; border-radius: 75px 75px 0 0; height: 110px; }
+        .hair3 { background-color: #A52A2A; border-radius: 75px 75px 0 0; height: 90px; }
+        .hair4 { background-color: #D2691E; border-radius: 75px 75px 0 0; height: 80px; }
+        
+        /* For outfit selection */
+        .outfit1 { background-color: #FF69B4; border-radius: 40px 40px 0 0; }
+        .outfit2 { background-color: #FF1493; border-radius: 40px 40px 0 0; }
+        .outfit3 { background-color: #9932CC; border-radius: 30px 30px 0 0; }
+        .outfit4 { background-color: #1E90FF; border-radius: 0; }
+        .outfit5 { background-color: #FF6347; border-radius: 10px 10px 0 0; }
+        .outfit6 { background-color: #4169E1; border-radius: 20px 20px 0 0; }
+        .outfit7 { background-color: #8A2BE2; border-radius: 25px 25px 0 0; }
+        .outfit8 { background-color: #DC143C; border-radius: 35px 35px 0 0; }
+        
+        /* For makeup selection */
+        .makeup1 { background-color: rgba(255, 218, 185, 0.5); border-radius: 5px; }
+        .makeup2 { background-color: rgba(176, 224, 230, 0.7); border-radius: 5px; }
+        .makeup3 { background-color: rgba(173, 216, 230, 0.6); border-radius: 5px; }
+        .makeup4 { 
+            background: linear-gradient(to right, 
+                rgba(255, 0, 0, 0.3), 
+                rgba(255, 165, 0, 0.3), 
+                rgba(255, 255, 0, 0.3), 
+                rgba(0, 128, 0, 0.3), 
+                rgba(0, 0, 255, 0.3), 
+                rgba(75, 0, 130, 0.3), 
+                rgba(238, 130, 238, 0.3)); 
+            border-radius: 5px; 
+        }
+        
+        /* For shoes selection */
+        .shoes1 { background-color: #FFD700; border-radius: 0 0 20px 20px; height: 30px; }
+        .shoes2 { background-color: #00FF7F; border-radius: 0 0 10px 10px; height: 30px; }
+        .shoes3 { background-color: #FF8C00; border-radius: 0 0 15px 15px; height: 20px; }
+        .shoes4 { background-color: #A0522D; border-radius: 0 0 5px 5px; height: 40px; }
+        
+        /* For accessory selection */
+        .accessory1 { background-color: #FF00FF; border-radius: 10px; height: 15px; top: 50px; }
+        .accessory2 { background-color: #C0C0C0; border-radius: 0; height: 10px; top: 150px; }
+        .accessory3 { background-color: #FFD700; border-radius: 50%; height: 20px; width: 20px; left: calc(50% - 10px); top: 170px; }
+        .accessory4 { background-color: #00FFFF; border-radius: 50%; height: 15px; width: 15px; left: calc(50% - 40px); top: 100px; }
+        .accessory5 { 
+            background-color: transparent; 
+            border: 5px solid #FFA500; 
+            border-radius: 50%; 
+            height: 30px; 
+            width: 30px; 
+            left: calc(50% - 20px); 
+            top: 170px; 
+        }
+        .accessory6 { 
+            border-top: 15px solid #FFD700; 
+            border-left: 8px solid transparent; 
+            border-right: 8px solid transparent; 
+            height: 0; 
+            width: 0; 
+            top: 60px; 
+        }
+        .accessory7 { 
+            background-color: #C0C0C0; 
+            border-radius: 50%; 
+            height: 10px; 
+            width: 40px; 
+            left: calc(50% - 20px); 
+            top: 440px; 
+        }
+        .accessory8 { 
+            background-color: #FF1493; 
+            opacity: 0.7;
+            height: 80px; 
+            width: 150px; 
+            top: 150px; 
+            z-index: -1;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff4d94;
+            animation: falling 5s linear infinite;
+        }
+        
+        @keyframes falling {
+            0% {
+                transform: translate(0, -10px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(20px, 100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            .wardrobe-panel {
+                width: 100%;
+                height: 40vh;
+                border-right: none;
+                border-bottom: 8px solid #C71585;
+                border-radius: 0 0 20px 20px;
+            }
+            
+            .character-panel {
+                width: 100%;
+                height: calc(60vh - 50px);
+            }
+            
+            .items-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .character {
+                width: 200px;
+                height: 350px;
+            }
+            
+            .character-base {
+                width: 150px;
+                height: 300px;
+            }
+            
+            .party-selector {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div id="loading">Loading Party Prep Pal...</div>
-  <div id="error"></div>
-  <script>
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-      console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('error').style.display = 'block';
-      document.getElementById('error').innerHTML = 'Error loading game. Please try refreshing the page.<br><br>If the problem persists, please check your internet connection and try again.';
-      return false;
-    };
-
-    // Check if sketch.js exists
-    fetch('sketch.js')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('sketch.js not found');
+    <div class="header">
+        <h1>Meera's Dress Up Game</h1>
+    </div>
+    
+    <div class="game-container">
+        <div class="wardrobe-panel">
+            <div class="category">
+                <h3>Hairstyles</h3>
+                <div class="items-grid" id="hair-items">
+                    <div class="item" onclick="changeItem('hair', 'hair1')">
+                        <div style="width: 40px; height: 40px; background-color: #000000; border-radius: 50% 50% 0 0;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('hair', 'hair2')">
+                        <div style="width: 40px; height: 40px; background-color: #8B4513; border-radius: 50% 50% 0 0;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('hair', 'hair3')">
+                        <div style="width: 40px; height: 40px; background-color: #A52A2A; border-radius: 50% 50% 0 0;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('hair', 'hair4')">
+                        <div style="width: 40px; height: 40px; background-color: #D2691E; border-radius: 50% 50% 0 0;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>Outfits</h3>
+                <div class="items-grid" id="outfit-items">
+                    <div class="item" onclick="changeItem('outfit', 'outfit1')">
+                        <div style="width: 30px; height: 50px; background-color: #FF69B4;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('outfit', 'outfit2')">
+                        <div style="width: 30px; height: 50px; background-color: #FF1493;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('outfit', 'outfit3')">
+                        <div style="width: 30px; height: 50px; background-color: #9932CC;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('outfit', 'outfit4')">
+                        <div style="width: 30px; height: 50px; background-color: #1E90FF;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('outfit', 'outfit5')">
+                        <div style="width: 30px; height: 50px; background-color: #FF6347;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('outfit', 'outfit6')">
+                        <div style="width: 30px; height: 50px; background-color: #4169E1;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('outfit', 'outfit7')">
+                        <div style="width: 30px; height: 50px; background-color: #8A2BE2;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('outfit', 'outfit8')">
+                        <div style="width: 30px; height: 50px; background-color: #DC143C;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>Makeup</h3>
+                <div class="items-grid" id="makeup-items">
+                    <div class="item" onclick="changeItem('makeup', 'makeup1')">
+                        <div style="width: 40px; height: 20px; background-color: #FFDAB9; border-radius: 5px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('makeup', 'makeup2')">
+                        <div style="width: 40px; height: 20px; background-color: #B0E0E6; border-radius: 5px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('makeup', 'makeup3')">
+                        <div style="width: 40px; height: 20px; background-color: #ADD8E6; border-radius: 5px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('makeup', 'makeup4')">
+                        <div style="width: 40px; height: 20px; background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet); border-radius: 5px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>Shoes</h3>
+                <div class="items-grid" id="shoes-items">
+                    <div class="item" onclick="changeItem('shoes', 'shoes1')">
+                        <div style="width: 40px; height: 20px; background-color: #FFD700; border-radius: 0 0 10px 10px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('shoes', 'shoes2')">
+                        <div style="width: 40px; height: 20px; background-color: #00FF7F; border-radius: 0 0 10px 10px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('shoes', 'shoes3')">
+                        <div style="width: 40px; height: 20px; background-color: #FF8C00; border-radius: 0 0 10px 10px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('shoes', 'shoes4')">
+                        <div style="width: 40px; height: 20px; background-color: #A0522D; border-radius: 0 0 10px 10px;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="category">
+                <h3>Accessories</h3>
+                <div class="items-grid" id="accessory-items">
+                    <div class="item" onclick="changeItem('accessory', 'accessory1')">
+                        <div style="width: 40px; height: 10px; background-color: #FF00FF; border-radius: 5px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('accessory', 'accessory2')">
+                        <div style="width: 40px; height: 5px; background-color: #C0C0C0;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('accessory', 'accessory3')">
+                        <div style="width: 20px; height: 20px; background-color: #FFD700; border-radius: 50%;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('accessory', 'accessory4')">
+                        <div style="width: 15px; height: 15px; background-color: #00FFFF; border-radius: 50%;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('accessory', 'accessory5')">
+                        <div style="width: 20px; height: 20px; border: 3px solid #FFA500; border-radius: 50%;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('accessory', 'accessory6')">
+                        <div style="width: 0; height: 0; border-left: 10px solid transparent; border-right: 10px solid transparent; border-bottom: 20px solid #FFD700;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('accessory', 'accessory7')">
+                        <div style="width: 30px; height: 5px; background-color: #C0C0C0; border-radius: 5px;"></div>
+                    </div>
+                    <div class="item" onclick="changeItem('accessory', 'accessory8')">
+                        <div style="width: 40px; height: 20px; background-color: #FF1493; opacity: 0.7;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="character-panel">
+            <div class="party-background" id="party-background"></div>
+            
+            <div class="character">
+                <div class="character-base"></div>
+                <div class="character-face">
+                    <div class="character-eyes">
+                        <div class="eye"></div>
+                        <div class="eye"></div>
+                    </div>
+                    <div class="character-smile"></div>
+                </div>
+                
+                <div class="hair-display" id="hair-display"></div>
+                <div class="outfit-display" id="outfit-display"></div>
+                <div class="makeup-display" id="makeup-display"></div>
+                <div class="shoes-display" id="shoes-display"></div>
+                <div class="accessory-display" id="accessory-display"></div>
+                <div class="bindi-display" id="bindi-display"></div>
+            </div>
+            
+            <div class="party-info">Meera, 8 years old</div>
+            
+            <div class="party-selector">
+                <button class="party-btn active" onclick="changeParty('Birthday')">Birthday</button>
+                <button class="party-btn" onclick="changeParty('Diwali')">Diwali</button>
+                <button class="party-btn" onclick="changeParty('New Year')">New Year</button>
+            </div>
+            
+            <button class="randomize-btn" onclick="randomizeAll()">Surprise Me! ✨</button>
+        </div>
+    </div>
+    
+    <script>
+        // Game state
+        const state = {
+            party: 'Birthday',
+            hair: '',
+            outfit: '',
+            makeup: '',
+            shoes: '',
+            accessory: ''
+        };
+        
+        // Party backgrounds
+        const partyBackgrounds = {
+            Birthday: 'rgba(255, 192, 203, 0.5)',
+            Diwali: 'rgba(255, 215, 0, 0.5)',
+            'New Year': 'rgba(0, 191, 255, 0.5)'
+        };
+        
+        // Function to change item
+        function changeItem(category, item) {
+            state[category] = item;
+            updateDisplay();
+            
+            // Update selected item UI
+            const itemsContainer = document.getElementById(`${category}-items`);
+            const items = itemsContainer.getElementsByClassName('item');
+            for (let i = 0; i < items.length; i++) {
+                items[i].classList.remove('selected');
+                if (items[i].getAttribute('onclick').includes(item)) {
+                    items[i].classList.add('selected');
+                }
+            }
         }
-      })
-      .catch(error => {
-        console.error('Error loading sketch.js:', error);
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error').style.display = 'block';
-        document.getElementById('error').innerHTML = 'Error loading game files. Please try refreshing the page.<br><br>If the problem persists, please check your internet connection and try again.';
-      });
-  </script>
-  <script src="sketch.js"></script>
-  <script>
-    // Hide loading message once p5 is ready
-    window.addEventListener('load', function() {
-      setTimeout(function() {
-        document.getElementById('loading').style.display = 'none';
-      }, 1000);
-    });
-  </script>
+        
+        // Function to change party type
+        function changeParty(party) {
+            state.party = party;
+            updateDisplay();
+            
+            // Update selected party button
+            const partyBtns = document.getElementsByClassName('party-btn');
+            for (let i = 0; i < partyBtns.length; i++) {
+                partyBtns[i].classList.remove('active');
+                if (partyBtns[i].textContent === party) {
+                    partyBtns[i].classList.add('active');
+                }
+            }
+        }
+        
+        // Show bindi for traditional outfits during Diwali
+        function updateBindi() {
+            const bindiElement = document.getElementById('bindi-display');
+            if ((state.outfit === 'outfit2' || state.outfit === 'outfit3' || state.outfit === 'outfit8') && state.party === 'Diwali') {
+                bindiElement.style.display = 'block';
+            } else {
+                bindiElement.style.display = 'none';
+            }
+        }
+        
+        // Function to update display
+        function updateDisplay() {
+            // Update party background
+            document.getElementById('party-background').style.backgroundColor = partyBackgrounds[state.party];
+            
+            // Update bindi based on outfit and party
+            updateBindi();
+            
+            // Clear previous displays
+            document.getElementById('hair-display').className = 'hair-display';
+            document.getElementById('outfit-display').className = 'outfit-display';
+            document.getElementById('makeup-display').className = 'makeup-display';
+            document.getElementById('shoes-display').className = 'shoes-display';
+            document.getElementById('accessory-display').className = 'accessory-display';
+            
+            // Add new class based on selection
+            if (state.hair) {
+                document.getElementById('hair-display').classList.add(state.hair);
+            }
+            
+            if (state.outfit) {
+                document.getElementById('outfit-display').classList.add(state.outfit);
+            }
+            
+            if (state.makeup) {
+                document.getElementById('makeup-display').classList.add(state.makeup);
+            }
+            
+            if (state.shoes) {
+                document.getElementById('shoes-display').classList.add(state.shoes);
+            }
+            
+            if (state.accessory) {
+                document.getElementById('accessory-display').classList.add(state.accessory);
+            }
+            
+            // Add confetti for festive feel
+            createConfetti();
+        }
+        
+        // Function to create confetti
+        function createConfetti() {
+            const characterPanel = document.querySelector('.character-panel');
+            const confettiCount = 20;
+            
+            // Remove old confetti
+            const oldConfetti = document.querySelectorAll('.confetti');
+            oldConfetti.forEach(confetti => confetti.remove());
+            
+            // Create new confetti
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 5 + 's';
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                characterPanel.appendChild(confetti);
+            }
+        }
+        
+        // Function to randomize all items
+        function randomizeAll() {
+            const categories = ['hair', 'outfit', 'makeup', 'shoes', 'accessory'];
+            categories.forEach(category => {
+                const itemsContainer = document.getElementById(`${category}-items`);
+                const items = itemsContainer.getElementsByClassName('item');
+                const randomIndex = Math.floor(Math.random() * items.length);
+                const randomItem = items[randomIndex].getAttribute('onclick').match(/'([^']+)'/)[1];
+                changeItem(category, randomItem);
+            });
+            
+            // Randomize party type
+            const partyTypes = ['Birthday', 'Diwali', 'New Year'];
+            const randomParty = partyTypes[Math.floor(Math.random() * partyTypes.length)];
+            changeParty(randomParty);
+        }
+        
+        // Initialize the game
+        window.addEventListener('load', () => {
+            // Set initial party background
+            document.getElementById('party-background').style.backgroundColor = partyBackgrounds[state.party];
+            
+            // Create initial confetti
+            createConfetti();
+        });
+    </script>
 </body>
 </html> 
