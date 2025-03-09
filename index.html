@@ -13,18 +13,58 @@
             align-items: center;
             min-height: 100vh;
             background: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
         }
         canvas {
             border: 2px solid #333;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            display: none;
+        }
+        #error {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: red;
+            font-size: 24px;
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <div id="loading">Loading game...</div>
+    <div id="error"></div>
+    <script>
+        // Show loading message
+        document.getElementById('loading').style.display = 'block';
+        
+        // Error handling for script loading
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = 'Error loading game. Please refresh the page.';
+            console.error('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError object: ' + JSON.stringify(error));
+            return false;
+        };
+    </script>
     <script src="js/RaceTrack.js"></script>
     <script src="js/PokemonRacer.js"></script>
     <script src="js/AdvancedPhysics.js"></script>
     <script src="js/SaffronCityCircuit.js"></script>
     <script src="js/sketch.js"></script>
+    <script>
+        // Hide loading message when all scripts are loaded
+        window.onload = function() {
+            document.getElementById('loading').style.display = 'none';
+        };
+    </script>
 </body>
 </html> 
