@@ -1,32 +1,63 @@
-# Party Prep Pal
+# PokéRacer - F1-Style Racing Game
 
-A fun dress-up game where you can create beautiful party looks! Perfect for kids who love fashion and creativity.
+A unique racing game that combines the thrill of Formula 1 racing with the world of Pokémon! Race through the Saffron City Circuit with your favorite Pokémon as F1-style racers.
 
 ## Features
-- Multiple hairstyles, dresses, shoes, and accessories
-- Three different party scenes (Diwali, Garden, Temple)
-- Achievement system with rewards
-- Save your progress automatically
-- Beautiful animations and effects
 
-## How to Play
-1. Drag items from the left side to dress up your character
-2. Try different combinations to unlock achievements
-3. Click "Go to Party!" to see your character in different scenes
-4. Use the scene buttons to change party backgrounds
+- Realistic F1-style racing physics
+- Pokémon type-specific traits and abilities
+- DRS zones and boost pads
+- Lap timing and sector timing
+- Dynamic weather effects
+- Spectator areas and crowd reactions
+- Item boxes with power-ups
+- Pit lane functionality
+- Multiple track hazards
 
-## Technologies Used
-- p5.js for graphics and animations
-- HTML5 and CSS3
-- JavaScript for game logic
+## Controls
 
-## Live Demo
-Visit [your-github-username.github.io/party-prep-pal](https://your-github-username.github.io/party-prep-pal) to play the game!
+- W/S: Throttle/Brake
+- A/D: Steering
+- Space: Drift
+- Shift: Boost
+- E: DRS
 
-## Local Development
-1. Clone this repository
-2. Open `index.html` in your web browser
-3. Start playing!
+## Setup
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/pokeracer.git
+cd pokeracer
+```
+
+2. Open `index.html` in your web browser to play the game.
+
+## Development
+
+The game is built using:
+- p5.js for graphics and game loop
+- Vanilla JavaScript for game logic
+- HTML5 Canvas for rendering
+
+## Project Structure
+
+```
+pokeracer/
+├── index.html          # Main HTML file
+├── js/                 # JavaScript source files
+│   ├── RaceTrack.js    # Base race track class
+│   ├── PokemonRacer.js # Base Pokémon racer class
+│   ├── F1PokemonRacer.js # F1-style Pokémon racer implementation
+│   ├── AdvancedPhysics.js # Physics engine
+│   ├── SaffronCityCircuit.js # Saffron City Circuit track
+│   └── sketch.js       # Main game loop
+└── README.md          # This file
+```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
-MIT License - feel free to use this project for your own purposes! 
+
+This project is licensed under the MIT License - see the LICENSE file for details. 
