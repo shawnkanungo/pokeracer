@@ -18,6 +18,7 @@ let achievementTimer = 0;
 let allAchievementsUnlocked = false;
 let celebrationTimer = 0;
 let soundEnabled = false;
+let audioContext;
 
 // Draggable items
 let items = {
@@ -50,15 +51,15 @@ let items = {
 function preload() {
   try {
     // Load sound effects
-    sounds.attach = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3', 
+    sounds.attach = loadSound('sounds/click.mp3', 
       () => console.log('Attach sound loaded'),
       () => console.log('Error loading attach sound')
     );
-    sounds.party = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3',
+    sounds.party = loadSound('sounds/click.mp3',
       () => console.log('Party sound loaded'),
       () => console.log('Error loading party sound')
     );
-    sounds.celebration = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3',
+    sounds.celebration = loadSound('sounds/click.mp3',
       () => console.log('Celebration sound loaded'),
       () => console.log('Error loading celebration sound')
     );
@@ -78,6 +79,9 @@ function setup() {
   resetButton = createButton("Reset Outfit");
   resetButton.position(50, 550);
   resetButton.mousePressed(resetOutfit);
+  
+  // Initialize audio context on first user interaction
+  getAudioContext().suspend();
   
   // Load saved game if exists
   loadGame();
@@ -679,6 +683,10 @@ function mouseDragged() {
 function playSound(soundName) {
   if (soundEnabled && sounds[soundName]) {
     try {
+      // Resume audio context on first sound play
+      if (getAudioContext().state !== 'running') {
+        getAudioContext().resume();
+      }
       sounds[soundName].play();
     } catch (error) {
       console.log('Error playing sound:', error);
