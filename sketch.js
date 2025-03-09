@@ -5,7 +5,6 @@ let button;
 let resetButton;
 let animationFrame = 0;
 let partyScene = "diwali"; // Can be "diwali", "garden", or "temple"
-let sounds = {};
 let achievements = {
   traditional: { name: "Traditional Beauty", description: "Wear a lehenga with juttis", unlocked: false },
   princess: { name: "Princess Party", description: "Wear the princess dress with tiara", unlocked: false },
@@ -17,8 +16,6 @@ let showAchievement = false;
 let achievementTimer = 0;
 let allAchievementsUnlocked = false;
 let celebrationTimer = 0;
-let soundEnabled = false;
-let audioContext;
 
 // Draggable items
 let items = {
@@ -48,28 +45,6 @@ let items = {
   hairClip: { x: 50, y: 850, dragged: false, attached: false, type: 'accessory', color: '#FF69B4' }
 };
 
-function preload() {
-  try {
-    // Load sound effects
-    sounds.attach = loadSound('sounds/click.mp3', 
-      () => console.log('Attach sound loaded'),
-      () => console.log('Error loading attach sound')
-    );
-    sounds.party = loadSound('sounds/click.mp3',
-      () => console.log('Party sound loaded'),
-      () => console.log('Error loading party sound')
-    );
-    sounds.celebration = loadSound('sounds/click.mp3',
-      () => console.log('Celebration sound loaded'),
-      () => console.log('Error loading celebration sound')
-    );
-    soundEnabled = true;
-  } catch (error) {
-    console.log('Sound loading disabled:', error);
-    soundEnabled = false;
-  }
-}
-
 function setup() {
   createCanvas(800, 600);
   button = createButton("Go to Party!");
@@ -79,9 +54,6 @@ function setup() {
   resetButton = createButton("Reset Outfit");
   resetButton.position(50, 550);
   resetButton.mousePressed(resetOutfit);
-  
-  // Initialize audio context on first user interaction
-  getAudioContext().suspend();
   
   // Load saved game if exists
   loadGame();
@@ -161,11 +133,6 @@ function drawCelebration() {
   text("Congratulations!", width/2, height/2);
   textSize(24);
   text("You've unlocked all achievements!", width/2, height/2 + 40);
-  
-  // Play celebration sound once
-  if (celebrationTimer === 1 && sounds.celebration) {
-    sounds.celebration.play();
-  }
 }
 
 function drawAchievementNotification() {
@@ -680,20 +647,6 @@ function mouseDragged() {
   }
 }
 
-function playSound(soundName) {
-  if (soundEnabled && sounds[soundName]) {
-    try {
-      // Resume audio context on first sound play
-      if (getAudioContext().state !== 'running') {
-        getAudioContext().resume();
-      }
-      sounds[soundName].play();
-    } catch (error) {
-      console.log('Error playing sound:', error);
-    }
-  }
-}
-
 function mouseReleased() {
   for (let item in items) {
     if (items[item].dragged) {
@@ -727,10 +680,6 @@ function mouseReleased() {
             items[item].attached = true;
           }
           break;
-      }
-      // Play sound if item was just attached
-      if (!wasAttached && items[item].attached) {
-        playSound('attach');
       }
     }
     items[item].dragged = false;
@@ -768,5 +717,4 @@ function resetOutfit() {
 
 function goToParty() {
   screen = "party";
-  playSound('party');
 } 
