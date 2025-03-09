@@ -17,6 +17,7 @@ let showAchievement = false;
 let achievementTimer = 0;
 let allAchievementsUnlocked = false;
 let celebrationTimer = 0;
+let soundEnabled = false;
 
 // Draggable items
 let items = {
@@ -47,10 +48,25 @@ let items = {
 };
 
 function preload() {
-  // Load sound effects
-  sounds.attach = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3');
-  sounds.party = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3');
-  sounds.celebration = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3');
+  try {
+    // Load sound effects
+    sounds.attach = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3', 
+      () => console.log('Attach sound loaded'),
+      () => console.log('Error loading attach sound')
+    );
+    sounds.party = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3',
+      () => console.log('Party sound loaded'),
+      () => console.log('Error loading party sound')
+    );
+    sounds.celebration = loadSound('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/sounds/click.mp3',
+      () => console.log('Celebration sound loaded'),
+      () => console.log('Error loading celebration sound')
+    );
+    soundEnabled = true;
+  } catch (error) {
+    console.log('Sound loading disabled:', error);
+    soundEnabled = false;
+  }
 }
 
 function setup() {
@@ -660,6 +676,16 @@ function mouseDragged() {
   }
 }
 
+function playSound(soundName) {
+  if (soundEnabled && sounds[soundName]) {
+    try {
+      sounds[soundName].play();
+    } catch (error) {
+      console.log('Error playing sound:', error);
+    }
+  }
+}
+
 function mouseReleased() {
   for (let item in items) {
     if (items[item].dragged) {
@@ -695,8 +721,8 @@ function mouseReleased() {
           break;
       }
       // Play sound if item was just attached
-      if (!wasAttached && items[item].attached && sounds.attach) {
-        sounds.attach.play();
+      if (!wasAttached && items[item].attached) {
+        playSound('attach');
       }
     }
     items[item].dragged = false;
@@ -734,7 +760,5 @@ function resetOutfit() {
 
 function goToParty() {
   screen = "party";
-  if (sounds.party) {
-    sounds.party.play();
-  }
+  playSound('party');
 } 
