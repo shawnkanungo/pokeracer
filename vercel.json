@@ -27,6 +27,10 @@
       }
     },
     {
+      "src": "/",
+      "dest": "/index.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "/$1",
       "headers": {
