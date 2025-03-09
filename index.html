@@ -136,20 +136,20 @@
             top: 50px;
             left: 50%;
             transform: translateX(-50%);
-            width: 200px;
-            height: 400px;
+            width: 180px;
+            height: 350px;
             background-color: #c68642;
-            border-radius: 100px 100px 0 0;
+            border-radius: 90px 90px 0 0;
         }
         
         .character-face {
             position: absolute;
-            top: 70px;
+            top: 60px;
             left: 50%;
             transform: translateX(-50%);
-            width: 120px;
-            height: 120px;
-            border-radius: 60% 60% 55% 55%;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
             background-color: #c68642;
             display: flex;
             flex-direction: column;
@@ -160,13 +160,13 @@
         .character-eyes {
             display: flex;
             justify-content: space-between;
-            width: 60px;
-            margin-top: 20px;
+            width: 50px;
+            margin-top: 15px;
         }
         
         .eye {
-            width: 20px;
-            height: 20px;
+            width: 15px;
+            height: 15px;
             background-color: white;
             border-radius: 50%;
             position: relative;
@@ -175,68 +175,156 @@
         .eye:after {
             content: '';
             position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #000;
+            border-radius: 50%;
+            top: 3.5px;
+            left: 3.5px;
+        }
+        
+        .eye:before {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            z-index: 1;
+        }
+        
+        .eye-lashes {
+            position: absolute;
+            width: 2px;
+            height: 5px;
+            background-color: #000;
+            top: -5px;
+            left: 6.5px;
+        }
+        
+        .eye-lashes:before {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 5px;
+            background-color: #000;
+            left: 4px;
+        }
+        
+        .eye-lashes:after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 5px;
+            background-color: #000;
+            left: 8px;
+        }
+        
+        .character-smile {
+            width: 30px;
+            height: 15px;
+            border-bottom: 3px solid #000;
+            border-radius: 0 0 15px 15px;
+            margin-top: 10px;
+        }
+        
+        .character-cheeks {
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background-color: rgba(255, 192, 203, 0.3);
+            border-radius: 50%;
+            top: 35px;
+        }
+        
+        .character-cheeks:before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background-color: rgba(255, 192, 203, 0.3);
+            border-radius: 50%;
+            left: 60px;
+        }
+        
+        .pigtail {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background-color: #000;
+            border-radius: 10px;
+            top: 30px;
+        }
+        
+        .pigtail.left {
+            left: -25px;
+            transform: rotate(-20deg);
+        }
+        
+        .pigtail.right {
+            right: -25px;
+            transform: rotate(20deg);
+        }
+        
+        .pigtail:before {
+            content: '';
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #000;
+            border-radius: 50%;
+            bottom: -5px;
+            left: 2.5px;
+        }
+        
+        .pigtail:after {
+            content: '';
+            position: absolute;
             width: 10px;
             height: 10px;
             background-color: #000;
             border-radius: 50%;
-            top: 5px;
+            bottom: -15px;
             left: 5px;
         }
         
-        .character-smile {
-            width: 40px;
-            height: 20px;
-            border-bottom: 3px solid #000;
-            border-radius: 0 0 20px 20px;
-            margin-top: 15px;
-        }
-        
-        .hair-display, 
-        .outfit-display, 
-        .makeup-display, 
-        .shoes-display, 
-        .accessory-display,
-        .bindi-display {
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
         .hair-display {
-            top: 30px;
-            width: 150px;
-            height: 150px;
+            top: 20px;
+            width: 130px;
+            height: 130px;
         }
         
         .outfit-display {
-            top: 190px;
-            width: 200px;
-            height: 250px;
+            top: 170px;
+            width: 180px;
+            height: 220px;
         }
         
         .makeup-display {
-            top: 100px;
-            width: 120px;
-            height: 30px;
+            top: 85px;
+            width: 100px;
+            height: 25px;
             opacity: 0.8;
         }
         
         .shoes-display {
-            bottom: 50px;
-            width: 150px;
-            height: 50px;
+            bottom: 40px;
+            width: 130px;
+            height: 40px;
         }
         
         .accessory-display {
-            top: 130px;
-            width: 150px;
-            height: 50px;
+            top: 110px;
+            width: 130px;
+            height: 40px;
         }
         
         .bindi-display {
-            top: 90px;
-            width: 10px;
-            height: 10px;
+            top: 75px;
+            width: 8px;
+            height: 8px;
             background-color: red;
             border-radius: 50%;
             display: none;
@@ -589,10 +677,17 @@
                 <div class="character-base"></div>
                 <div class="character-face">
                     <div class="character-eyes">
-                        <div class="eye"></div>
-                        <div class="eye"></div>
+                        <div class="eye">
+                            <div class="eye-lashes"></div>
+                        </div>
+                        <div class="eye">
+                            <div class="eye-lashes"></div>
+                        </div>
                     </div>
                     <div class="character-smile"></div>
+                    <div class="character-cheeks"></div>
+                    <div class="pigtail left"></div>
+                    <div class="pigtail right"></div>
                 </div>
                 
                 <div class="hair-display" id="hair-display"></div>
@@ -751,8 +846,8 @@
             changeParty(randomParty);
         }
         
-        // Initialize the game
-        window.addEventListener('load', () => {
+        // Initialize the game immediately
+        document.addEventListener('DOMContentLoaded', () => {
             // Set initial party background
             document.getElementById('party-background').style.backgroundColor = partyBackgrounds[state.party];
             
