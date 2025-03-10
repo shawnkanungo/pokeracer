@@ -1,244 +1,255 @@
-let car;
-let track;
-let camera;
+let scene, camera, renderer, car, track;
 let lapCount = 0;
 let checkpoints = [];
 let lastCheckpoint = -1;
 
-function setup() {
-    createCanvas(800, 600);
+// Initialize the game
+function init() {
+    // Create scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87CEEB); // Sky blue
+
+    // Create camera
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 5, 10);
+    camera.lookAt(0, 0, 0);
+
+    // Create renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.body.appendChild(renderer.domElement);
+
+    // Add lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 5, 5);
+    directionalLight.castShadow = true;
+    scene.add(directionalLight);
+
+    // Create ground
+    const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
+    const groundMaterial = new THREE.MeshStandardMaterial({ 
+        color: 0x90EE90,
+        side: THREE.DoubleSide
+    });
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
+
+    // Create track
+    createTrack();
+
+    // Create car
+    createCar();
+
+    // Add event listeners
+    window.addEventListener('resize', onWindowResize, false);
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    // Hide loading screen
+    document.getElementById('loading').style.display = 'none';
+}
+
+// Create the racing track
+function createTrack() {
+    const trackGeometry = new THREE.BufferGeometry();
+    const trackPoints = [
+        new THREE.Vector3(-20, 0.1, -20),
+        new THREE.Vector3(20, 0.1, -20),
+        new THREE.Vector3(20, 0.1, 20),
+        new THREE.Vector3(-20, 0.1, 20),
+        new THREE.Vector3(-20, 0.1, -20)
+    ];
     
-    // Initialize car with Mario Kart-like properties
+    trackGeometry.setFromPoints(trackPoints);
+    const trackMaterial = new THREE.LineBasicMaterial({ color: 0xffffff });
+    track = new THREE.Line(trackGeometry, trackMaterial);
+    scene.add(track);
+
+    // Create checkpoints
+    trackPoints.forEach((point, index) => {
+        if (index < trackPoints.length - 1) {
+            checkpoints.push({
+                position: point,
+                radius: 2,
+                passed: false
+            });
+        }
+    });
+}
+
+// Create the car
+function createCar() {
+    // Car body
+    const bodyGeometry = new THREE.BoxGeometry(2, 0.5, 4);
+    const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    body.castShadow = true;
+    body.receiveShadow = true;
+
+    // Wheels
+    const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 32);
+    const wheelMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+    
+    const wheels = [];
+    const wheelPositions = [
+        [-1.2, 0.2, -1.2], [1.2, 0.2, -1.2],
+        [-1.2, 0.2, 1.2], [1.2, 0.2, 1.2]
+    ];
+
+    wheelPositions.forEach(pos => {
+        const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+        wheel.position.set(...pos);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.castShadow = true;
+        wheel.receiveShadow = true;
+        wheels.push(wheel);
+        body.add(wheel);
+    });
+
     car = {
-        x: 400,
-        y: 300,
+        mesh: body,
         speed: 0,
         angle: 0,
-        acceleration: 0.3,
-        maxSpeed: 6,
-        turnSpeed: 0.04,
+        acceleration: 0.1,
+        maxSpeed: 0.5,
+        turnSpeed: 0.02,
         drift: false,
-        driftAngle: 0,
-        boost: 0,
-        color: '#FF0000'
-    };
-    
-    // Initialize camera
-    camera = {
-        x: 0,
-        y: 0
-    };
-    
-    // Create a more interesting track with Mario Kart-like elements
-    track = {
-        points: [
-            // Main track
-            {x: 100, y: 100},
-            {x: 700, y: 100},
-            {x: 700, y: 300},
-            {x: 600, y: 400},
-            {x: 400, y: 500},
-            {x: 200, y: 400},
-            {x: 100, y: 300},
-            {x: 100, y: 100}
-        ],
-        width: 40
+        boost: 0
     };
 
-    // Create checkpoints for lap counting
-    for (let i = 0; i < track.points.length; i++) {
-        checkpoints.push({
-            x: track.points[i].x,
-            y: track.points[i].y,
-            radius: 20,
-            passed: false
-        });
+    scene.add(car.mesh);
+}
+
+// Handle window resize
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+// Handle key presses
+function onKeyDown(event) {
+    switch(event.keyCode) {
+        case 38: // Up arrow
+            car.speed = Math.min(car.speed + car.acceleration, car.maxSpeed);
+            break;
+        case 40: // Down arrow
+            car.speed = Math.max(car.speed - car.acceleration, -car.maxSpeed/2);
+            break;
+        case 37: // Left arrow
+            if (event.shiftKey) {
+                car.drift = true;
+                car.mesh.rotation.y += car.turnSpeed * 2;
+            } else {
+                car.mesh.rotation.y += car.turnSpeed;
+            }
+            break;
+        case 39: // Right arrow
+            if (event.shiftKey) {
+                car.drift = true;
+                car.mesh.rotation.y -= car.turnSpeed * 2;
+            } else {
+                car.mesh.rotation.y -= car.turnSpeed;
+            }
+            break;
+        case 32: // Spacebar
+            car.boost = 1;
+            car.speed = Math.min(car.speed * 1.5, car.maxSpeed * 1.5);
+            break;
     }
 }
 
-function draw() {
-    background('#87CEEB'); // Sky blue background
-    
-    // Update camera position to follow car
-    camera.x = car.x - width/2;
-    camera.y = car.y - height/2;
-    
-    push();
-    translate(-camera.x, -camera.y);
-    
-    // Draw grass background
-    fill('#90EE90');
-    rect(0, 0, 2000, 2000);
-    
-    // Draw track
-    stroke(100);
-    strokeWeight(track.width);
-    noFill();
-    beginShape();
-    for (let point of track.points) {
-        vertex(point.x, point.y);
+// Handle key releases
+function onKeyUp(event) {
+    switch(event.keyCode) {
+        case 37: // Left arrow
+        case 39: // Right arrow
+            car.drift = false;
+            break;
     }
-    endShape(CLOSE);
-    
-    // Draw track edges
-    stroke(255);
-    strokeWeight(2);
-    beginShape();
-    for (let point of track.points) {
-        vertex(point.x, point.y);
-    }
-    endShape(CLOSE);
-    
-    // Draw checkpoints
-    for (let i = 0; i < checkpoints.length; i++) {
-        if (!checkpoints[i].passed) {
-            fill(255, 255, 0);
-            circle(checkpoints[i].x, checkpoints[i].y, checkpoints[i].radius * 2);
-        }
-    }
-    
-    pop();
-    
-    // Draw car with Mario Kart-like style
-    push();
-    translate(car.x, car.y);
-    rotate(car.angle + (car.drift ? car.driftAngle : 0));
-    
-    // Car shadow
-    fill(0, 0, 0, 50);
-    ellipse(0, 15, 40, 10);
-    
-    // Car body
-    fill(car.color);
-    rect(-20, -15, 40, 30);
-    
-    // Car details
-    fill(255);
-    rect(-15, -10, 30, 20);
-    
-    // Wheels
-    fill(0);
-    rect(-25, -20, 10, 10);
-    rect(15, -20, 10, 10);
-    rect(-25, 10, 10, 10);
-    rect(15, 10, 10, 10);
-    
-    // Boost effect
-    if (car.boost > 0) {
-        fill(255, 165, 0, car.boost * 100);
-        rect(-30, -5, 10, 10);
-    }
-    
-    pop();
-    
-    // Draw HUD
-    drawHUD();
-    
+}
+
+// Update game state
+function update() {
     // Update car position
-    car.x += cos(car.angle) * car.speed;
-    car.y += sin(car.angle) * car.speed;
-    
+    car.mesh.position.x += Math.sin(car.mesh.rotation.y) * car.speed;
+    car.mesh.position.z += Math.cos(car.mesh.rotation.y) * car.speed;
+
     // Apply friction
     car.speed *= 0.98;
-    
+
     // Update boost
     if (car.boost > 0) {
-        car.boost -= 0.1;
+        car.boost -= 0.01;
     }
-    
-    // Check checkpoint collisions
+
+    // Update camera position
+    camera.position.x = car.mesh.position.x;
+    camera.position.z = car.mesh.position.z + 10;
+    camera.position.y = 5;
+    camera.lookAt(car.mesh.position);
+
+    // Check checkpoints
     checkCheckpoints();
+
+    // Update HUD
+    updateHUD();
 }
 
-function drawHUD() {
-    // Lap counter
-    fill(255);
-    textSize(24);
-    textAlign(LEFT, TOP);
-    text(`Lap: ${lapCount + 1}/3`, 20, 20);
-    
-    // Speed indicator
-    text(`Speed: ${Math.round(car.speed * 10)}`, 20, 50);
-    
-    // Boost indicator
-    if (car.boost > 0) {
-        fill(255, 165, 0);
-        rect(20, 80, car.boost * 100, 10);
-    }
-}
-
+// Check checkpoint collisions
 function checkCheckpoints() {
-    for (let i = 0; i < checkpoints.length; i++) {
-        let d = dist(car.x, car.y, checkpoints[i].x, checkpoints[i].y);
-        if (d < checkpoints[i].radius && !checkpoints[i].passed) {
-            checkpoints[i].passed = true;
+    checkpoints.forEach((checkpoint, index) => {
+        const distance = car.mesh.position.distanceTo(checkpoint.position);
+        if (distance < checkpoint.radius && !checkpoint.passed) {
+            checkpoint.passed = true;
             
-            // If this is the first checkpoint and we've passed all others, complete a lap
-            if (i === 0 && lastCheckpoint === checkpoints.length - 1) {
+            if (index === 0 && lastCheckpoint === checkpoints.length - 1) {
                 lapCount++;
                 if (lapCount >= 3) {
-                    // Game over
                     alert('Race Complete!');
                     resetGame();
                 }
             }
             
-            lastCheckpoint = i;
-            break;
+            lastCheckpoint = index;
         }
-    }
+    });
 }
 
+// Update HUD
+function updateHUD() {
+    document.getElementById('lap').textContent = lapCount + 1;
+    document.getElementById('speed').textContent = Math.round(Math.abs(car.speed) * 100);
+    document.getElementById('boost').textContent = Math.round(car.boost * 100);
+}
+
+// Reset game
 function resetGame() {
     lapCount = 0;
-    car.x = 400;
-    car.y = 300;
+    car.mesh.position.set(0, 0.5, 0);
     car.speed = 0;
     car.angle = 0;
     car.boost = 0;
     lastCheckpoint = -1;
     
-    for (let checkpoint of checkpoints) {
+    checkpoints.forEach(checkpoint => {
         checkpoint.passed = false;
-    }
+    });
 }
 
-function keyPressed() {
-    if (keyCode === UP_ARROW) {
-        car.speed = min(car.speed + car.acceleration, car.maxSpeed);
-    }
-    if (keyCode === DOWN_ARROW) {
-        car.speed = max(car.speed - car.acceleration, -car.maxSpeed/2);
-    }
-    if (keyCode === LEFT_ARROW) {
-        if (keyIsDown(SHIFT)) {
-            // Drift left
-            car.drift = true;
-            car.driftAngle = -0.2;
-            car.speed *= 1.2;
-        } else {
-            car.angle -= car.turnSpeed;
-        }
-    }
-    if (keyCode === RIGHT_ARROW) {
-        if (keyIsDown(SHIFT)) {
-            // Drift right
-            car.drift = true;
-            car.driftAngle = 0.2;
-            car.speed *= 1.2;
-        } else {
-            car.angle += car.turnSpeed;
-        }
-    }
-    if (keyCode === 32) { // Spacebar for boost
-        car.boost = 1;
-        car.speed = min(car.speed * 1.5, car.maxSpeed * 1.5);
-    }
+// Animation loop
+function animate() {
+    requestAnimationFrame(animate);
+    update();
+    renderer.render(scene, camera);
 }
 
-function keyReleased() {
-    if (keyCode === LEFT_ARROW || keyCode === RIGHT_ARROW) {
-        car.drift = false;
-        car.driftAngle = 0;
-    }
-} 
+// Start the game
+init();
+animate(); 
