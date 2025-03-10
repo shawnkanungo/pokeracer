@@ -85,12 +85,16 @@ function createTrack() {
 
 // Create the car
 function createCar() {
+    // Create a group to hold both car and Pokémon
+    const vehicleGroup = new THREE.Group();
+
     // Car body
     const bodyGeometry = new THREE.BoxGeometry(2, 0.5, 4);
     const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
     const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
     body.castShadow = true;
     body.receiveShadow = true;
+    vehicleGroup.add(body);
 
     // Wheels
     const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 32);
@@ -109,18 +113,61 @@ function createCar() {
         wheel.castShadow = true;
         wheel.receiveShadow = true;
         wheels.push(wheel);
-        body.add(wheel);
+        vehicleGroup.add(wheel);
     });
 
+    // Create Pokémon character (Pikachu-like shape)
+    const pokemonGroup = new THREE.Group();
+    
+    // Body
+    const pokemonBody = new THREE.Mesh(
+        new THREE.SphereGeometry(0.8, 32, 32),
+        new THREE.MeshStandardMaterial({ color: 0xFFFF00 })
+    );
+    pokemonBody.position.set(0, 1.2, 0);
+    pokemonBody.castShadow = true;
+    pokemonBody.receiveShadow = true;
+    pokemonGroup.add(pokemonBody);
+
+    // Eyes
+    const eyeGeometry = new THREE.SphereGeometry(0.15, 16, 16);
+    const eyeMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+    
+    const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+    leftEye.position.set(-0.3, 1.4, 0.7);
+    pokemonGroup.add(leftEye);
+    
+    const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+    rightEye.position.set(0.3, 1.4, 0.7);
+    pokemonGroup.add(rightEye);
+
+    // Cheeks
+    const cheekGeometry = new THREE.CircleGeometry(0.2, 32);
+    const cheekMaterial = new THREE.MeshStandardMaterial({ color: 0xFF0000 });
+    
+    const leftCheek = new THREE.Mesh(cheekGeometry, cheekMaterial);
+    leftCheek.position.set(-0.8, 1.2, 0.7);
+    leftCheek.rotation.y = Math.PI / 2;
+    pokemonGroup.add(leftCheek);
+    
+    const rightCheek = new THREE.Mesh(cheekGeometry, cheekMaterial);
+    rightCheek.position.set(0.8, 1.2, 0.7);
+    rightCheek.rotation.y = -Math.PI / 2;
+    pokemonGroup.add(rightCheek);
+
+    // Add Pokémon to vehicle group
+    vehicleGroup.add(pokemonGroup);
+
     car = {
-        mesh: body,
+        mesh: vehicleGroup,
         speed: 0,
         angle: 0,
         acceleration: 0.1,
         maxSpeed: 0.5,
         turnSpeed: 0.02,
         drift: false,
-        boost: 0
+        boost: 0,
+        pokemon: pokemonGroup
     };
 
     scene.add(car.mesh);
@@ -181,12 +228,24 @@ function update() {
     car.mesh.position.x += Math.sin(car.mesh.rotation.y) * car.speed;
     car.mesh.position.z += Math.cos(car.mesh.rotation.y) * car.speed;
 
+    // Animate Pokémon
+    if (car.speed > 0) {
+        // Bounce animation when moving
+        car.pokemon.position.y = 1.2 + Math.sin(Date.now() * 0.01) * 0.1;
+    } else {
+        car.pokemon.position.y = 1.2;
+    }
+
     // Apply friction
     car.speed *= 0.98;
 
     // Update boost
     if (car.boost > 0) {
         car.boost -= 0.01;
+        // Add boost effect to Pokémon
+        car.pokemon.material.color.setHex(0xFFA500);
+    } else {
+        car.pokemon.material.color.setHex(0xFFFF00);
     }
 
     // Update camera position
