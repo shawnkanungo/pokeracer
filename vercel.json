@@ -2,11 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "*.js",
+      "src": "*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "*.html",
+      "src": "*.js",
       "use": "@vercel/static"
     },
     {
@@ -20,22 +20,12 @@
   ],
   "routes": [
     {
-      "src": "/js/(.*)",
-      "dest": "/js/$1",
-      "headers": {
-        "cache-control": "public, max-age=31536000, immutable"
-      }
-    },
-    {
       "src": "/",
       "dest": "/index.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1",
-      "headers": {
-        "cache-control": "public, max-age=0, must-revalidate"
-      }
+      "dest": "/$1"
     }
   ],
   "headers": [
@@ -49,6 +39,15 @@
         {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }

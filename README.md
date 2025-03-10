@@ -1,63 +1,39 @@
-# PokéRacer - F1-Style Racing Game
+# PokéKart
 
-A unique racing game that combines the thrill of Formula 1 racing with the world of Pokémon! Race through the Saffron City Circuit with your favorite Pokémon as F1-style racers.
+A fun racing game that combines Mario Kart-style racing with Pokémon elements! Race around the track, collect power-ups and items, and use your Pokémon's special abilities to win.
 
 ## Features
 
-- Realistic F1-style racing physics
-- Pokémon type-specific traits and abilities
-- DRS zones and boost pads
-- Lap timing and sector timing
-- Dynamic weather effects
-- Spectator areas and crowd reactions
-- Item boxes with power-ups
-- Pit lane functionality
-- Multiple track hazards
+- Mario Kart-style racing mechanics
+- Pokémon character with special abilities
+- Power-ups and items to collect
+- Drift mechanics
+- Boost system
+- Lap tracking
+- Checkpoint system
 
 ## Controls
 
-- W/S: Throttle/Brake
-- A/D: Steering
-- Space: Drift
-- Shift: Boost
-- E: DRS
+- Arrow keys: Move the car
+- Shift + Arrow keys: Drift
+- Spacebar: Boost
+- I key: Use item
+- P key: Use power-up
 
-## Setup
+## How to Play
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/pokeracer.git
-cd pokeracer
-```
-
-2. Open `index.html` in your web browser to play the game.
+1. Use the arrow keys to control your car
+2. Collect power-ups and items along the track
+3. Use your Pokémon's special abilities strategically
+4. Complete 3 laps to win the race
 
 ## Development
 
-The game is built using:
-- p5.js for graphics and game loop
-- Vanilla JavaScript for game logic
-- HTML5 Canvas for rendering
-
-## Project Structure
-
-```
-pokeracer/
-├── index.html          # Main HTML file
-├── js/                 # JavaScript source files
-│   ├── RaceTrack.js    # Base race track class
-│   ├── PokemonRacer.js # Base Pokémon racer class
-│   ├── F1PokemonRacer.js # F1-style Pokémon racer implementation
-│   ├── AdvancedPhysics.js # Physics engine
-│   ├── SaffronCityCircuit.js # Saffron City Circuit track
-│   └── sketch.js       # Main game loop
-└── README.md          # This file
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+This game is built using:
+- Three.js for 3D graphics
+- JavaScript for game logic
+- HTML5 and CSS3 for the interface
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+MIT License 
